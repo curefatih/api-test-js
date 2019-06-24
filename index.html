@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/style.css">
+	<title>Taze - JScamp - swapi</title>
+</head>
+
+<body>
+	<div class="container">
+		<nav class="menu">
+			<div class="menu-item active" id="filmButton">Films</div>
+			<div class="menu-item" id="personButton">Persons</div>
+		</nav>
+		<div class="content">
+			<div class="content-type films">
+			
+			</div>
+			<div class="content-type peoples">
+				
+			</div>
+		</div>
+	</div>
+</body>
+<script src="js/api.js"></script>
+<script>
+	let next = {};
+	function peoplePromise(opt = "") {
+		const parentDiv = document.querySelector(".peoples");
+		if(opt === null || opt === ""){
+			parentDiv.innerHTML = `<div class="people-item">
+					<div class="people-name">Name</div>
+					<div class="people-birth_year">Birth year</div>
+					<div class="people-gender">Gender</div>
+					<div class="people-eye_color">Eye color</div>
+					<div class="people-hair_color">Hair Color</div>
+					<div class="people-height">Height</div>
+					<div class="people-mass">Mass</div>
+					<div class="people-skin_color">Skin color</div>
+					<div class="people-films">Films</div>
+					<div class="people-vehicles">Vehicles</div>
+				</div>`;
+		}
+
+
+		new Promise(async function (resolve, reject) {
+			next.current = opt;
+			resolve(next.type === "people" ? await getPeoples(opt) : await getPeoples())
+		}).then(function (jsonData) {
+			// console.log(jsonData);
+
+			next = {
+				url: jsonData.next,
+				type: jsonData.next === null ? null : "people",
+			}
+
+
+
+			jsonData.results.map(people => {
+				let peopleDiv = document.createElement("div");
+				peopleDiv.classList.add("people-item");
+				let result = `
+						<div class="people-name">${people.name}</div>
+						<div class="people-birth_year">${people.birth_year}</div>
+						<div class="people-gender">${people.gender}</div>
+						<div class="people-eye_color">${people.eye_color}</div>
+						<div class="people-hair_color">${people.hair_color}</div>
+						<div class="people-height">${people.height}</div>
+						<div class="people-mass">${people.mass}</div>
+						<div class="people-skin_color">${people.skin_color}</div>
+						<div class="people-films">${people.films}</div>
+						<div class="people-vehicles">${people.vehicles}</div>
+					`;
+
+				peopleDiv.innerHTML = result;
+				parentDiv.appendChild(peopleDiv);
+			})
+		}).catch(function (reason) {
+			console.log(reason);
+			const peopleErrorDiv = document.createElement("div");
+			peopleErrorDiv.classList.add("people-error");
+			peopleErrorDiv.innerHTML = `Error: ${reason}`
+
+			parentDiv.appendChild(peopleDiv);
+		})
+
+	}
+
+
+	function filmPromise(opt = "") {
+		const parentDiv = document.querySelector(".films");
+		if(opt === null || opt ===""){
+			parentDiv.innerHTML = `	<div class="film-item">
+						<div class="film-title">Title</div>
+						<div class="film-episode_id">Episode id</div>
+						<div class="film-opening_crawl">Opening crawl</div>
+						<div class="film-director">Director</div>
+						<div class="film-producer">Producer</div>
+						<div class="film-release_date">Release date</div>
+						<div class="film-characters">Characters</div>
+						<div class="film-planets">Planets</div>
+						<div class="film-starships">Starships</div>
+						<div class="film-vehicles">Vehicles</div>
+						<div class="film-species">Species</div>
+					</div>`;
+		}
+
+
+		new Promise(async function (resolve, reject) {
+			next.current = opt;
+			resolve(next.type === "films" ? await getFilms(opt) : await getFilms())
+		}).then(function (jsonData) {
+			// console.log(jsonData);
+
+			next = {
+				url: jsonData.next,
+				type: jsonData.next === null ? null : "films",
+			}
+
+
+
+			jsonData.results.map(filmArr => {
+				let peopleDiv = document.createElement("div");
+				peopleDiv.classList.add("people-item");
+				let result = `
+						<div class="film-title">${filmArr.title}</div>
+						<div class="film-episode_id">${filmArr.episode_id}</div>
+						<div class="film-opening_crawl">${filmArr.opening_crawl}</div>
+						<div class="film-director">${filmArr.director}</div>
+						<div class="film-producer">${filmArr.producer}</div>
+						<div class="film-release_date">${filmArr.release_date}</div>
+						<div class="film-characters">${filmArr.characters}</div>
+						<div class="film-planets">${filmArr.planets}</div>
+						<div class="film-starships">${filmArr.starships}</div>
+						<div class="film-vehicles">${filmArr.vehicles}</div>
+						<div class="film-species">${filmArr.species}</div>
+		
+					`;
+
+				peopleDiv.innerHTML = result;
+				parentDiv.appendChild(peopleDiv);
+			})
+		}).catch(function (reason) {
+			console.log(reason);
+			const peopleErrorDiv = document.createElement("div");
+			peopleErrorDiv.classList.add("people-error");
+			peopleErrorDiv.innerHTML = `Error: ${reason}`
+
+			parentDiv.appendChild(peopleDiv);
+		})
+
+	}
+
+
+	document.querySelector('#personButton').addEventListener('click', function (event) {
+
+
+		document.querySelectorAll(".menu-item").forEach(element => {
+			element.classList.remove("active");
+		});
+
+		document.querySelectorAll(".content-type").forEach(element => {
+			element.classList.add("hidden");
+		});
+
+		document.querySelector(".peoples").classList.remove("hidden");
+
+		event.currentTarget.classList.add("active");
+
+
+		peoplePromise();
+
+	})
+
+	document.querySelector('#filmButton').addEventListener('click', function (event) {
+
+
+		document.querySelectorAll(".menu-item").forEach(element => {
+			element.classList.remove("active");
+		});
+
+		document.querySelectorAll(".content-type").forEach(element => {
+			element.classList.add("hidden");
+		});
+
+		document.querySelector(".films").classList.remove("hidden");
+
+		event.currentTarget.classList.add("active");
+
+
+		filmPromise();
+
+	})
+
+
+	document.addEventListener("scroll", function (event) {
+		console.log(next.url);
+		if (window.scrollMaxY == window.scrollY && next.current !== next.url && next.url !== undefined | null) {
+
+			switch (next.type) {
+				case "people":
+					// console.log("asdasdasd");
+					peoplePromise(next.url)
+					break;
+				case "films":
+					filmPromise(next.url)
+					break;
+				case null:
+
+					break;
+
+				default:
+					break;
+			}
+		}
+	})
+</script>
+
+</html>
